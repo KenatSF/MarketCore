@@ -11,7 +11,9 @@ contract Kronos is ERC20, Ownable, AccessControl {
 
     bytes32 public constant ROL_MINTER = keccak256("ROL_MINTER");
 
-    constructor() ERC20("Kronos", "KRN") {}
+    constructor() ERC20("Kronos", "KRN") {
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
 
     modifier onlyMinter() {
         require(hasRole(ROL_MINTER, msg.sender), "Only a minter can execute this function!");

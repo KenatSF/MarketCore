@@ -37,7 +37,7 @@ contract Kronos is ERC20, Ownable, AccessControl {
         _mint(account, amount);
     }
 
-    function burn(uint256 amount) public virtual onlyMinter {
+    function burn(uint256 amount) public virtual {
         _burn(msg.sender, amount);
     }
     

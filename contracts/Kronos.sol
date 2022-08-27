@@ -13,6 +13,7 @@ contract Kronos is ERC20, Ownable, AccessControl {
 
     constructor() ERC20("Kronos", "KRN") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(ROL_MINTER, msg.sender);
     }
 
     modifier onlyMinter() {

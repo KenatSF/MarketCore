@@ -13,6 +13,7 @@ contract Kronofungible is ERC1155, AccessControl, ERC1155Burnable {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     uint256 private _maxSupply = 50;
+    uint256 private _maxFungiblePerToken = 5;
 
     constructor() ERC1155("") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -22,6 +23,10 @@ contract Kronofungible is ERC1155, AccessControl, ERC1155Burnable {
 
     function maxSupply() public view virtual returns (uint256) {
         return _maxSupply;
+    }
+
+    function maxFungiblePerToken() public view virtual returns (uint256) {
+        return _maxFungiblePerToken;
     }
 
     function setURI(string memory newuri) public onlyRole(URI_SETTER_ROLE) {
@@ -34,24 +39,18 @@ contract Kronofungible is ERC1155, AccessControl, ERC1155Burnable {
     {
         uint256 newToken = _idTokens.current();
         require(newToken < maxSupply(), "Max Supply reached!");
+        require( ( ( 0 < amount ) && ( amount <= maxFungiblePerToken() ) ), "You can't mint that amount per Token!");
         _mint(account, newToken, amount, data);
 
         _idTokens.increment();
-    }
-
-    function mintBatch(address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
-        public
-        onlyRole(MINTER_ROLE)
-    {
-        _mintBatch(to, ids, amounts, data);
     }
 
     function mintBatch(address to, uint256 idsNumber, uint256[] memory amounts, bytes memory data)
         public
         onlyRole(MINTER_ROLE)
     {
-        require( ( ( 0 < idsNumber ) && ( idsNumber <= 5 ) ), "You can't mint that amount of Tokens!");
-        require(idsNumber == amounts.length, "Ids number and length of amounts array must be equal!");
+        require( ( ( 1 < idsNumber ) && ( idsNumber <= 5 ) ), "You can't mint that amount of Tokens in once!");
+        require(idsNumber == amounts.length, "Number of ids and length of amounts array must be equal!");
 
         uint256 newToken = _idTokens.current();
         require(newToken < maxSupply(), "Max Supply reached!");
@@ -61,6 +60,7 @@ contract Kronofungible is ERC1155, AccessControl, ERC1155Burnable {
         uint256[] memory idsArray = new uint256[](idsNumber);
 
         for(uint i = 0; i < idsNumber; i++) {
+            require( ( ( 0 < amounts[i] ) && ( amounts[i] <= maxFungiblePerToken() ) ), "You can't mint that amount per Token!");
             uint currentIndex = _idTokens.current();
             idsArray[i] = currentIndex;
             _idTokens.increment();

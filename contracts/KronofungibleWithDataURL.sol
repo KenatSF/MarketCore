@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./Base64.sol";
 
-contract Kronofungible is ERC1155, AccessControl {
+contract KronofungibleWithDataURL is ERC1155, AccessControl {
     using Strings for uint256;
     using Counters for Counters.Counter;
     Counters.Counter private _idTokens;
@@ -16,8 +16,8 @@ contract Kronofungible is ERC1155, AccessControl {
     bytes32 public constant URI_SETTER_ROLE = keccak256("URI_SETTER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    uint256 private _maxSupply = 5;
-    uint256 private _maxFungiblePerToken = 2;
+    uint256 private _maxSupply = 8;
+    uint256 private _maxFungiblePerToken = 5;
 
     string private _baseURI ="https://ipfs.io/ipfs/";
 
@@ -47,9 +47,29 @@ contract Kronofungible is ERC1155, AccessControl {
         string memory _tokenURI = _tokenURIs[tokenId];
 
         // If token URI is set, concatenate base URI and tokenURI (via abi.encodePacked).
-        return bytes(_tokenURI).length > 0 ? string(abi.encodePacked(_baseURI, _tokenURI)) : super.uri(tokenId);
+        return bytes(_tokenURI).length > 0 ? string(_tokenURI) : super.uri(tokenId);
     }
 
+    function stickHash(string memory _hash) internal view virtual returns(string memory) {
+        return string(abi.encodePacked(getBaseURI(), _hash));
+    }
+
+    function codeJSON(uint256 tokenId, string memory _hash) internal view virtual returns (string memory) {
+
+        string memory hashImage = stickHash(_hash);
+        string memory jsonURI = Base64.encode(
+            abi.encodePacked(
+                '{ "name": "Kronofungible AI #',
+                tokenId,
+                '", "description": "This image was created by an AI!", "image": "',
+                hashImage,
+                '"}'
+            )
+        );
+
+        return
+            string(abi.encodePacked("data:application/json;base64,", jsonURI));
+    }
 
     function _setURI(uint256 tokenId, string memory _tokenURI) internal virtual {
         _tokenURIs[tokenId] = _tokenURI;
@@ -64,7 +84,7 @@ contract Kronofungible is ERC1155, AccessControl {
         require(newToken < maxSupply(), "Max Supply reached!");
         require( ( ( 0 < amount ) && ( amount <= maxFungiblePerToken() ) ), "You can't mint that amount per Token!");
         _mint(account, newToken, amount, data);
-        _setURI(newToken, hash);
+        _setURI(newToken, codeJSON(newToken, hash));
 
         _idTokens.increment();
     }
@@ -93,7 +113,7 @@ contract Kronofungible is ERC1155, AccessControl {
         _mintBatch(to, idsArray, amounts, data);
 
         for(uint i = 0; i < idsNumber; i++) {
-            _setURI(idsArray[i], hash[i]);
+            _setURI(idsArray[i], codeJSON(idsArray[i], hash[i]));
         }
     }
 

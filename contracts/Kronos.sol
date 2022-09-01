@@ -7,7 +7,7 @@ import { AccessControl } from  '@openzeppelin/contracts/access/AccessControl.sol
 
 contract Kronos is ERC20, Ownable, AccessControl {
 
-    uint256 private _maxSupply = 100000000*1e18;
+    uint256 private _maxSupply = 500000*1e18;
 
     bytes32 public constant ROL_MINTER = keccak256("ROL_MINTER");
 

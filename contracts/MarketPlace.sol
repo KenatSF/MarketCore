@@ -30,7 +30,6 @@ contract MarketPlace is Ownable {
         bool sold;
     }
     mapping(uint256 => ItemCreated) private idMarketItems;
-    address fundsRedeemer;
 
     event MarketItemCreated(uint256 itemId, uint256 tokenId);
     event MarketItemBought(uint256 itemId, uint256 tokenId, address buyer);
@@ -38,7 +37,6 @@ contract MarketPlace is Ownable {
     constructor(address _kronosAddress, address _kronoFungibleAddress) {
         kronos = IERC20(_kronosAddress);
         kronofungible = Kronofungible(_kronoFungibleAddress);
-        fundsRedeemer = msg.sender;
     }
 
     

@@ -11,7 +11,6 @@ contract Kronofungible is ERC1155URIStorage, AccessControl {
     using Counters for Counters.Counter;
     Counters.Counter private _idTokens;
 
-    bytes32 public constant URI_SETTER_ROLE = keccak256("URI_SETTER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     uint256 private _maxSupply = 24;
@@ -20,7 +19,6 @@ contract Kronofungible is ERC1155URIStorage, AccessControl {
 
     constructor() ERC1155("") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(URI_SETTER_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
     }
 

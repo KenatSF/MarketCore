@@ -80,19 +80,6 @@ contract MarketPlace is Ownable {
     }
 
 
-    function fetchMarketItems() public view returns (ItemCreated[] memory) {
-        uint totalMarketItems = marketItems.current();
-
-        ItemCreated[] memory items = new ItemCreated[](totalMarketItems);
-
-        for(uint i = 0; i < totalMarketItems; i++) {
-            ItemCreated memory currentItem = idMarketItems[i]; 
-            items[i] = currentItem;
-        }
-
-        return items;
-    }
-
 
 
 

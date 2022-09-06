@@ -5,8 +5,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./Kronofungible.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 
-contract MarketPlace is Ownable {
+contract MarketPlace is Ownable, ERC1155Receiver {
     using Counters for Counters.Counter;
     Counters.Counter private marketItems;
 
@@ -15,7 +16,7 @@ contract MarketPlace is Ownable {
     Kronofungible public kronofungible;
 
     // Free tokens
-    uint256 private freeTokens;
+    uint256 private freeTokensAmount;
     bool private depositedFreeTokens;
     mapping(address => bool) private receivedFreeTokens;
 
@@ -62,6 +63,14 @@ contract MarketPlace is Ownable {
         emit MarketItemCreated(itemId, tokenId);
     }
 
+    function onERC1155Received(address, address, uint256, uint256, bytes memory) public override virtual returns (bytes4) {
+        return this.onERC1155Received.selector;
+    }
+
+    function onERC1155BatchReceived(address, address, uint256[] memory, uint256[] memory, bytes memory) public override virtual returns (bytes4) {
+        return this.onERC1155BatchReceived.selector;
+    }
+
 
     function buyItem(uint256 itemId) public {
         // Note: itemId != tokenId
@@ -73,15 +82,14 @@ contract MarketPlace is Ownable {
 
         uint256 nftAmount = kronofungible.balanceOf(address(this), itemId);
 
+        idMarketItems[itemId].buyer = msg.sender;
+        idMarketItems[itemId].sold = true;
+
         kronofungible.safeTransferFrom(address(this), msg.sender, itemId, nftAmount, "");
 
 
         emit MarketItemBought(itemId, idMarketItems[itemId].tokenId, msg.sender);
     }
-
-
-
-
 
     function getDepositAmount() public view returns (uint256) {
         return depositAmount;
@@ -91,8 +99,8 @@ contract MarketPlace is Ownable {
         return buyingPrice;
     }
 
-    function getFreeTokens() public view returns (uint256) {
-        return freeTokens;
+    function getFreeTokensAmount() public view returns (uint256) {
+        return freeTokensAmount;
     }
 
     function getCurrentMarketItems() public view returns (uint256) {
@@ -107,20 +115,20 @@ contract MarketPlace is Ownable {
         require(!depositedFreeTokens, "Free deposit was already done!");
 
         require(kronos.transferFrom(msg.sender, address(this), buyingPrice*4),"Transfer failed");
-        freeTokens = buyingPrice*4;
+        freeTokensAmount = buyingPrice*4;
         depositedFreeTokens = true;
     }
 
     function claimFreeKronos() public {
         require(depositedFreeTokens, "Free deposit hasn't been done!");
-        require(freeTokens > 0, "There is not more tokens to claim!");
+        require(freeTokensAmount > 0, "There is not more tokens to claim!");
         require(!receivedFreeTokens[msg.sender], "You can claime the tokens just once!");
-        freeTokens -= buyingPrice;
+        freeTokensAmount -= buyingPrice;
         receivedFreeTokens[msg.sender] = true;
-        require(kronos.transferFrom(address(this), msg.sender, buyingPrice), "Transfer failed");
+        require(kronos.transfer(msg.sender, buyingPrice), "Transfer failed");
     }
 
-    function witdrawKronosTokens() public onlyOwner {
+    function withdrawKronosTokens() public onlyOwner {
         require(depositAmount > 0, "Insufficient balance!");
         require(kronos.transfer(owner(), depositAmount), "Transfer failed!");
     }

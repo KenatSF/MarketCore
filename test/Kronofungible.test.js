@@ -79,7 +79,7 @@ describe("Kronofungible", function () {
     currentIndexMinted = await krn.currentIndexMinted();
 
     console.log('-----------------------------------------------------------');
-    console.log("Show foruth call!");
+    console.log("Show fourth call!");
     expect(currentIndexMinted).to.equal(23);
 
   });

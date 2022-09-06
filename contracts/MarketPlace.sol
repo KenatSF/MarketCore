@@ -23,7 +23,7 @@ contract MarketPlace is Ownable, ERC1155Receiver {
 
     // Variables Contract
     uint256 private depositAmount;
-    uint256 private buyingPrice = 10000*1e18;
+    uint256 private buyingPrice = 10*1e18;
     struct ItemCreated {
         uint256 itemId;
         uint256 tokenId;

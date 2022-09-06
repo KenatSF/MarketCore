@@ -23,7 +23,7 @@ contract MarketPlace is Ownable, ERC1155Receiver {
 
     // Variables Contract
     uint256 private depositAmount;
-    uint256 private buyingPrice = 10*1e18;
+    uint256 private buyingPrice = 10000*1e18;
     struct ItemCreated {
         uint256 itemId;
         uint256 tokenId;
@@ -67,6 +67,7 @@ contract MarketPlace is Ownable, ERC1155Receiver {
         return this.onERC1155Received.selector;
     }
 
+    // The next function shouldn't be here but in order to prevent this contract being marked as an abstract, we must define the function.
     function onERC1155BatchReceived(address, address, uint256[] memory, uint256[] memory, bytes memory) public override virtual returns (bytes4) {
         return this.onERC1155BatchReceived.selector;
     }
@@ -89,6 +90,10 @@ contract MarketPlace is Ownable, ERC1155Receiver {
 
 
         emit MarketItemBought(itemId, idMarketItems[itemId].tokenId, msg.sender);
+    }
+
+    function fetchMarketItem(uint256 itemId) public view returns (ItemCreated memory) {
+        return idMarketItems[itemId];
     }
 
     function getDepositAmount() public view returns (uint256) {

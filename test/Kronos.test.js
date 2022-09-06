@@ -1,8 +1,8 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("NFTMarket", function () {
-  it("Should create and execute market sales", async function () {
+describe("ERC20 Kronos", function () {
+  it("Testing the contract", async function () {
     const maxAmount = "500";
     // Accounts managament
     const [user0, user1, user2, user3, deployer ] = await ethers.getSigners();

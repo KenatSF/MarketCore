@@ -130,5 +130,12 @@ describe("Marketplace", function () {
     } catch(e) {
         console.log("Error: Double claim free tokens from same account.");
     }
+
+    const itemStruct = await market.fetchMarketItem(0);
+    
+
+    console.log('-----------------------------------------------------------');
+    console.log("Show sixth call");
+    expect(itemStruct.sold).to.equal(true);
   });
 });

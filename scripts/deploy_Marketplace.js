@@ -1,8 +1,8 @@
 const hre = require("hardhat");
 
 async function main() {
-    const kronosAddress = "0x51B49afF5d05e36eD50a38D0c3bA575B6F88dDF7";
-    const kronofungibleAddress = "0xf9014CdB0B51E7FFE0F0Cf3d78a40a6e35B52487";
+    const kronosAddress = "0x19bd842C4EF5F837600f17a1949c0Ed729379Eae";
+    const kronofungibleAddress = "0x4dC153127A6959aF5e85bEb0abf0186415A2b9C7";
 
     const MARKET = await hre.ethers.getContractFactory("MarketPlace");
     const market = await MARKET.deploy(kronosAddress, kronofungibleAddress);

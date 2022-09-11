@@ -24,6 +24,7 @@ contract MarketPlace is Ownable, ERC1155Receiver {
     // Variables Contract
     uint256 private depositAmount;
     uint256 private buyingPrice = 10000*1e18;
+    mapping(address => bool) private boughtNFT;
     struct ItemCreated {
         uint256 itemId;
         uint256 tokenId;
@@ -77,7 +78,7 @@ contract MarketPlace is Ownable, ERC1155Receiver {
         // Note: itemId != tokenId
 
         require(!idMarketItems[itemId].sold, "Item sold");
-
+        require(!boughtNFT[msg.sender], "You can buy only one NFT!");
         require(kronos.transferFrom(msg.sender, address(this), buyingPrice), "transfer failed");
         depositAmount += buyingPrice;
 
@@ -85,9 +86,9 @@ contract MarketPlace is Ownable, ERC1155Receiver {
 
         idMarketItems[itemId].buyer = msg.sender;
         idMarketItems[itemId].sold = true;
+        boughtNFT[msg.sender] = true;
 
         kronofungible.safeTransferFrom(address(this), msg.sender, itemId, nftAmount, "");
-
 
         emit MarketItemBought(itemId, idMarketItems[itemId].tokenId, msg.sender);
     }
@@ -116,6 +117,7 @@ contract MarketPlace is Ownable, ERC1155Receiver {
     }
 
 
+    //  Free Tokens
     function depositFreeKronos() public onlyOwner {
         require(!depositedFreeTokens, "Free deposit was already done!");
 
@@ -124,6 +126,7 @@ contract MarketPlace is Ownable, ERC1155Receiver {
         depositedFreeTokens = true;
     }
 
+    //  Free Tokens
     function claimFreeKronos() public {
         require(depositedFreeTokens, "Free deposit hasn't been done!");
         require(freeTokensAmount > 0, "There is not more tokens to claim!");
@@ -133,6 +136,7 @@ contract MarketPlace is Ownable, ERC1155Receiver {
         require(kronos.transfer(msg.sender, buyingPrice), "Transfer failed");
     }
 
+    // Withdraw tokens deposited by NFT buyers
     function withdrawKronosTokens() public onlyOwner {
         require(depositAmount > 0, "Insufficient balance!");
         require(kronos.transfer(owner(), depositAmount), "Transfer failed!");

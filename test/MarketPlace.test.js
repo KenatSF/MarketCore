@@ -71,7 +71,7 @@ describe("Marketplace", function () {
 
     // Kronos token
     await krn.connect(deployer).transfer(user0.address, ethers.utils.parseUnits("10000", "ether"))
-    await krn.connect(user0).approve(marketAddress, ethers.utils.parseUnits("10000", "ether"));
+    await krn.connect(user0).approve(marketAddress, ethers.utils.parseUnits("20000", "ether"));
     var user0Balance = await krn.balanceOf(user0.address);
 
 
@@ -129,6 +129,12 @@ describe("Marketplace", function () {
         await market.connect(user0).claimFreeKronos();
     } catch(e) {
         console.log("Error: Double claim free tokens from same account.");
+    }
+    try {
+        await market.connect(user0).buyItem(1);
+        console.log("Item 1: bought");
+    } catch(e) {
+        console.log("Error: Buying more that one NFT is impossible");
     }
 
     const itemStruct = await market.fetchMarketItem(0);

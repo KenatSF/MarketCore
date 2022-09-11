@@ -42,11 +42,11 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
       chainId: 137,
       accounts: [PRIVATE_KEY],
       gasLimit: 3000000,
-      gasPrice: 80000000000
+      gasPrice: 50000000000
     },
   },
   etherscan: {
-    apiKey: process.env.API_KEY_AVAX_SCAN
+    apiKey: process.env.API_KEY_POLYGON_SCAN
   },
   contractSizer: {
     alphaSort: true,
